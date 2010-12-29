@@ -45,7 +45,7 @@
 
 /* which ports is your shit on? */
 #define	LCD_CTRL		PORTB
-#define LCD_DATA		PORTD
+#define LCD_DATA		PORTC
 
 /* bit bang time allowances */
 #define LCD_DELAY_INIT		15
@@ -53,6 +53,7 @@
 #define LCD_DELAY_DATA		1
 
 uint8_t				lcd_bits = 4;
+uint8_t				data_bus_shift = 0;
 
 /*
  * XXX make operations non-blatting, ie use the current values of the
@@ -65,7 +66,7 @@ uint8_t				lcd_bits = 4;
 void
 lcd_write4(uint8_t rs, uint8_t rw, uint8_t data)
 {
-	uint8_t			ctrl = 0;
+	uint8_t			ctrl = 8;
 
 	if (rw)
 		ctrl += LCD_P_RW;
@@ -74,7 +75,7 @@ lcd_write4(uint8_t rs, uint8_t rw, uint8_t data)
 		ctrl += LCD_P_RS;
 
 	/* data bus on 4 most sig bits of PORTD */
-	LCD_DATA = data << 4;
+	LCD_DATA = data << data_bus_shift;
 
 	/* bring EN pin up and down again */
 	LCD_CTRL = ctrl & ((~LCD_P_EN) & 0x0f);
@@ -197,14 +198,15 @@ int
 main(void)
 {
 	/* set PORTD for LCD output */
-	DDRB = 0xff;
-	DDRD = 0xf0;
+	DDRB = 0x0f;
+	DDRC = 0x0f;
 
 	LCD_DATA = 0;
 	LCD_CTRL = 0;
 
 	/* wait for lcd to come up */
 	_delay_ms(LCD_DELAY_INIT);
+	LCD_CTRL = 0xff; /* power lcd logic */
 
 	lcd_function_set(2);
 
