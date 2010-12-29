@@ -13,31 +13,24 @@ BIN_FORMAT=ihex
 PORT=/dev/cuaU0
 #BAUD=57600
 BAUD=115200
-#BAUD=38400
 PROTOCOL=arduino
-#PART=ATMEGA3290
 PART=ATMEGA328P
 CFLAGS=-Wall -Os -DF_CPU=$(F_CPU) -mmcu=$(MCU)
 SUDO=sudo
 
-.SUFFIXES: .elf .hex
-
-.c.elf:
-	$(CC) $(CFLAGS) -o $@ $<
-
-.elf.hex:
-	$(OBJCOPY) -O $(BIN_FORMAT) -R .eeprom $< $@
+.c.o:
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 .PHONY: all
-all: ${PROG}.hex
+all: lcd.o main.o ${PROG}.hex
 
-${PROG}.hex: ${PROG}.elf
-
-${PROG}.elf: ${PROG}.c
+${PROG}.hex: lcd.o main.o
+	${CC} ${CFLAGS} -o ${PROG} lcd.o main.o
+	$(OBJCOPY) -O $(BIN_FORMAT) -R .eeprom ${PROG} ${PROG}.hex
 
 .PHONY: clean
 clean:
-	$(RM) ${PROG}.elf ${PROG}.hex
+	$(RM) ${PROG}.hex ${PROG}.o main.o ${PROG}
 
 .PHONY: upload
 upload: ${PROG}.hex
