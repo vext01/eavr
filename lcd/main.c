@@ -19,6 +19,7 @@
  */
 
 #include <avr/io.h>
+#include <util/delay.h>
 
 #include "ealcd_params.h"
 #include "ealcd.h"
@@ -34,9 +35,6 @@ main(void)
 	/* PORTC for LCD control bus */
 	DDRC = 0x0f;
 
-	EALCD_DATA = 0;
-	EALCD_CTRL = 0;
-
 	/* set up lcd */
 	ealcd_init();
 
@@ -46,18 +44,21 @@ main(void)
 	/* cursor on, blink, font 1 */
 	ealcd_display_ctrl(1, 1, 1);
 
-	/* clear screen and start at far left */
-	ealcd_home();
-	ealcd_clear();
+	while(1) {
+		/* clear screen and start at far left */
+		ealcd_home();
+		ealcd_clear();
 
-	ealcd_put_string("EAVR LCD                                ");
+		ealcd_put_string("EAVR LCD                                ");
 
-	ealcd_put_string("Version");
-	for (c = rev; *c != ':'; c ++);
-	for (; *c != '$'; c ++)
-		ealcd_put_char(*c);
+		ealcd_put_string("Version");
+		for (c = rev; *c != ':'; c ++);
+		for (; *c != '$'; c ++)
+			ealcd_put_char(*c);
 
-	while(1);
+		_delay_ms(2000);
+	}
+
 
 	return (0);
 }

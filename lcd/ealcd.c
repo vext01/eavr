@@ -37,7 +37,7 @@ void
 ealcd_init()
 {
 	/* power lcd logic */
-	EALCD_CTRL = EALCD_P_PO;
+	EALCD_CBUS_PORT = EALCD_P_PO;
 	_delay_ms(EALCD_DELAY_INIT);
 }
 
@@ -45,7 +45,7 @@ ealcd_init()
 void
 ealcd_write4(uint8_t rs, uint8_t rw, uint8_t data)
 {
-	uint8_t			ctrl = 8; /* EALCD_CTRL << 4 == lcd power */
+	uint8_t			ctrl = EALCD_P_PO;
 
 	if (rw)
 		ctrl += EALCD_P_RW;
@@ -54,14 +54,14 @@ ealcd_write4(uint8_t rs, uint8_t rw, uint8_t data)
 		ctrl += EALCD_P_RS;
 
 	/* data bus on 4 most sig bits of PORTD */
-	EALCD_DATA = data << EALCD_DBUS_SHIFT;
+	EALCD_DBUS_PORT = data << EALCD_DBUS_SHIFT;
 
 	/* bring EN pin up and down again */
-	EALCD_CTRL = ctrl & ((~EALCD_P_EN) & 0x0f);
+	EALCD_CBUS_PORT = ctrl & ((~EALCD_P_EN) & 0x0f);
 	_delay_ms(EALCD_DELAY_CMD);
-	EALCD_CTRL = ctrl | EALCD_P_EN;
+	EALCD_CBUS_PORT = ctrl | EALCD_P_EN;
 	_delay_ms(EALCD_DELAY_CMD);
-	EALCD_CTRL = ctrl & ((~EALCD_P_EN) & 0x0f);
+	EALCD_CBUS_PORT = ctrl & ((~EALCD_P_EN) & 0x0f);
 }
 
 void
