@@ -233,7 +233,7 @@ main(void)
 
 	lcd_put_string("EAVR LCD - lcd.c                        ");
 
-	lcd_put_string("Version: ");
+	lcd_put_string("Version");
 	for (c = rev; *c != ':'; c ++);
 	for (; *c != '$'; c ++)
 		lcd_put_char(*c);
