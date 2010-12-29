@@ -22,7 +22,9 @@
 #define EALCD_CLEAR_BASE	(1 << 0)
 #define EALCD_HOME_BASE		(1 << 1)
 #define EALCD_DC_BASE		(1 << 3)
+#define EALCD_SHIFT_BASE	(1 << 4)
 #define EALCD_FS_BASE		(1 << 5)
+#define EALCD_SET_DD_ADDR_BASE	(1 << 7)
 
 /* non data pins */
 #define EALCD_P_EN		(1 << 0)
@@ -40,6 +42,16 @@
 #define EALCD_P_DC_C		(1 << 1)
 #define EALCD_P_DC_B		(1 << 0)
 
+/* shift stuff */
+#define EALCD_P_SHIFT_CD	(1 << 3)
+#define EALCD_P_SHIFT_LR	(1 << 2)
+
+#define EALCD_SHIFT_LEFT	0
+#define EALCD_SHIFT_RIGHT	1
+
+#define EALCD_SHIFT_CURS	0
+#define EALCD_SHIFT_DISP	1
+
 /* bit bang time allowances */
 #define EALCD_DELAY_INIT	15
 #define EALCD_DELAY_CMD		5
@@ -50,10 +62,11 @@ void			ealcd_write4(uint8_t rs, uint8_t rw, uint8_t data);
 void			ealcd_write8(uint8_t rs, uint8_t rw, uint8_t data);
 void			ealcd_put_char(char c);
 void			ealcd_put_string(char *s);
-void			ealcd_function_set(uint8_t num_lines);
-void			ealcd_display_ctrl(uint8_t on, uint8_t cursor,
-				uint8_t blink);
+void			ealcd_function_set(uint8_t, uint8_t);
+void			ealcd_display_ctrl(uint8_t, uint8_t, uint8_t);
 void			ealcd_clear();
 void			ealcd_home();
+void			ealcd_set_ddram_addr(uint8_t);
+void			ealcd_shift(uint8_t, uint8_t);
 
 #endif /* ealcd.h */
