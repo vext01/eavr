@@ -102,7 +102,7 @@ ealcd_put_string(char *s)
  * set number of bits to 4, number of lines and font
  */
 void
-ealcd_function_set(uint8_t num_lines)
+ealcd_function_set(uint8_t num_lines, uint8_t font)
 {
 	uint8_t			ctrl = EALCD_FS_BASE;
 
@@ -116,10 +116,11 @@ ealcd_function_set(uint8_t num_lines)
 		exit (0); /* cant do this */
 	}
 
-	/* XXX other font */
+	/* does not seem to work XXX */
+	ctrl += (font * EALCD_P_FS_F);
 
 	ealcd_write8(0, 0, ctrl);
-	ealcd_write4(0, 0, 0);
+	ealcd_write4(0, 0, 0);	/* as per datasheet */
 }
 
 void
@@ -149,4 +150,21 @@ void
 ealcd_home()
 {
 	ealcd_write8(0, 0, EALCD_HOME_BASE);
+}
+
+void
+ealcd_set_ddram_addr(uint8_t addr)
+{
+	ealcd_write8(0, 0, EALCD_SET_DD_ADDR_BASE + addr);
+}
+
+void
+ealcd_shift(uint8_t screen_or_curs, uint8_t lr)
+{
+	uint8_t			d = EALCD_SHIFT_BASE;
+
+	d += (lr * EALCD_P_SHIFT_LR);
+	d += (screen_or_curs * EALCD_P_SHIFT_CD);
+
+	ealcd_write8(0, 0, d);
 }
