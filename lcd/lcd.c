@@ -207,7 +207,7 @@ debug_blink()
 int
 main(void)
 {
-	char			rev[20] = "$Revision: 8$", *c;
+	char			rev[20] = "$Revision$", *c;
 
 	/* set PORTB for LCD databus */
 	DDRB = 0x0f;
