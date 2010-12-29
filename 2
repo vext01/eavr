@@ -1,0 +1,204 @@
+/*
+ * Copyright (c) 2010, Edd Barrett <vext01@gmail.com>
+ * $Id$
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *
+ * A 4-bit HD44780 interface for an AVR board.
+ * Currently does not check busy status of the controller, only bitbangs.
+ */
+
+#include <avr/io.h>
+#include <util/delay.h>
+#include <stdlib.h>
+
+/* non data pins */
+#define LCD_P_EN		(1 << 0)
+#define LCD_P_RW		(1 << 1)
+#define LCD_P_RS		(1 << 2)
+
+/* function set stuff */
+#define LCD_FS_BASE		(1 << 5)
+
+#define LCD_P_FS_DL		(1 << 4)
+#define LCD_P_FS_N		(1 << 3)
+#define LCD_P_FS_F		(1 << 2)
+
+/* display control stuff */
+#define LCD_DC_BASE		(1 << 3)
+
+#define LCD_P_D			(1 << 2)
+#define LCD_P_C			(1 << 1)
+#define LCD_P_B			(1 << 0)
+
+/* which ports is your shit on? */
+#define	LCD_CTRL		PORTB
+#define LCD_DATA		PORTD
+
+/* XXX do this properly */
+#define LCD_DELAY		6
+
+uint8_t				lcd_bits = 4;
+
+/*
+ * XXX make operations non-blatting, ie use the current values of the
+ * AVR ports and just ammend what we need to change. Will prevent
+ * peripherals on other pins from being nuked.
+ */ 
+
+/* write in 4 byte mode (LSb) */
+void
+lcd_write4(uint8_t rs, uint8_t rw, uint8_t data)
+{
+	uint8_t			ctrl = 0;
+
+	if (rw)
+		ctrl += LCD_P_RW;
+
+	if (rs)
+		ctrl += LCD_P_RS;
+
+	/* data bus on 4 most sig bits of PORTD */
+	LCD_DATA = data << 4;
+
+	/* bring EN pin up and down again */
+	LCD_CTRL = ctrl & ((~LCD_P_EN) & 0x0f);
+	_delay_ms(LCD_DELAY);
+	LCD_CTRL = ctrl | LCD_P_EN;
+	_delay_ms(LCD_DELAY);
+	LCD_CTRL = ctrl & ((~LCD_P_EN) & 0x0f);
+	_delay_ms(LCD_DELAY);
+
+}
+
+void
+lcd_write8(uint8_t rs, uint8_t rw, uint8_t data)
+{
+	uint8_t			low, high;
+
+	low = data & 0x0f;
+	high = (data & 0xf0) >> 4;
+
+	lcd_write4(rs, rw, high);
+	lcd_write4(rs, rw, low);
+}
+
+void
+lcd_put_char(char c)
+{
+	lcd_write8(1, 0, c);
+}
+
+void
+lcd_put_string(char *s)
+{
+	for (; *s != 0; s ++)
+		lcd_put_char(*s);
+}
+
+/*
+ * set number of bits, number of lines and font
+ */
+void
+lcd_function_set(uint8_t num_lines)
+{
+	uint8_t			ctrl = LCD_FS_BASE;
+
+	switch (lcd_bits) {
+	case 8:
+		ctrl = ctrl + LCD_P_FS_N;
+		break;
+	case 4:
+		break;
+	default:
+		exit (1); /* bad, should not happen */
+		break;
+	};
+
+	switch (num_lines) {
+	case 2:
+		ctrl = ctrl + LCD_P_FS_N;
+		break;
+	case 1:
+		break;
+	default:
+		exit (0); /* cant do this */
+	}
+
+	/* XXX other font */
+
+	lcd_write8(0, 0, ctrl);
+	if (lcd_bits == 4)
+		lcd_write4(0, 0, 0);
+}
+
+void
+lcd_display_ctrl(uint8_t on, uint8_t cursor)
+{
+
+}
+
+int
+main(void)
+{
+	/* set PORTD for LCD output */
+	DDRB = 0xff;
+	DDRD = 0xf0;
+
+	LCD_DATA = 0;
+	LCD_CTRL = 0;
+
+	/*
+	 * the following is the example from the data sheet
+	 */
+
+	/* 4 bit operation */
+	//lcd_write4(0, 0, 0b0010);
+
+	/* 4 bit operation (again?!) + set font */
+	//lcd_write4(0, 0, 0b0010);
+	//lcd_write4(0, 0, 0b0000);
+
+	lcd_function_set(2);
+
+	/* turn on display and cursor */
+	lcd_write4(0, 0, 0b0000);
+	lcd_write4(0, 0, 0b1110);
+
+	/* shift cursor */
+#if 0
+	lcd_write4(0, 0, 0b0000);
+	lcd_write4(0, 0, 0b0110);
+#endif
+
+	lcd_write4(0, 0, 0);
+	lcd_write4(0, 0, 0b1);
+
+	/* write H */
+#if 0
+	lcd_write4(1, 0, 0b0100);
+	lcd_write4(1, 0, 0b1000);
+
+	lcd_write8(1,0,0b01001000);
+	lcd_write8(1,0,'i');
+#endif
+
+	lcd_put_string("Test123 - Edd!");
+	lcd_put_string("Test123 - Edd!");
+	lcd_put_string("Test123 - Edd!");
+
+	//lcd_write4(1, 1, 0b1000);
+	while(1);
+
+	return (0);
+}
