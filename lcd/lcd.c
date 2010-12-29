@@ -21,6 +21,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 /* command "bases", commands before any params set */
 #define LCD_CLEAR_BASE		(1 << 0)
@@ -65,7 +66,7 @@
 void
 lcd_write4(uint8_t rs, uint8_t rw, uint8_t data)
 {
-	/* uint8_t			ctrl = 0; */
+	//uint8_t			ctrl = LCD_CTRL & (0xf0 << LCD_CBUS_SHIFT);
 	uint8_t			ctrl = 8; /* XXX to keep lcd power on */
 
 	if (rw)
@@ -186,8 +187,10 @@ debug_blink()
 int
 main(void)
 {
-	/* set PORTD for LCD output */
+	/* set PORTB for LCD databus */
 	DDRB = 0x0f;
+
+	/* PORTC for LCD control bus */
 	DDRC = 0x0f;
 
 	LCD_DATA = 0;
@@ -195,7 +198,7 @@ main(void)
 
 	/* wait for lcd to come up */
 	_delay_ms(LCD_DELAY_INIT);
-	LCD_CTRL = 0xff; /* power lcd logic */
+	LCD_CTRL = 0x8; /* power lcd logic */
 
 	lcd_function_set(2);
 
@@ -207,7 +210,7 @@ main(void)
 	lcd_clear();
 
 	/* put stuff */
-	lcd_put_string("FUCKSHIT!!!!!");
+	lcd_put_string("$Id$");
 
 	while(1);
 
