@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2010, Edd Barrett <vext01@gmail.com>
- * $Id$
+ * $Id: lcd.c 7 2010-12-29 17:22:43Z eb771 $
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -210,7 +210,8 @@ main(void)
 	lcd_clear();
 
 	/* put stuff */
-	lcd_put_string("$Id$");
+	lcd_put_string("EAVR LCD                                ");
+	lcd_put_string("$Revision$                              ");
 
 	while(1);
 
