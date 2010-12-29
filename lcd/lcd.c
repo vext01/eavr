@@ -43,17 +43,10 @@
 #define LCD_P_DC_C		(1 << 1)
 #define LCD_P_DC_B		(1 << 0)
 
-/* which ports is your shit on? */
-#define	LCD_CTRL		PORTB
-#define LCD_DATA		PORTC
-
 /* bit bang time allowances */
 #define LCD_DELAY_INIT		15
 #define LCD_DELAY_CMD		6
 #define LCD_DELAY_DATA		1
-
-uint8_t				lcd_bits = 4;
-uint8_t				data_bus_shift = 0;
 
 /*
  * XXX make operations non-blatting, ie use the current values of the
@@ -61,12 +54,19 @@ uint8_t				data_bus_shift = 0;
  * peripherals on other pins from being nuked.
  */ 
 
+/* which ports is your shit on? */
+#define	LCD_CTRL		PORTB
+#define LCD_DATA		PORTC
+#define LCD_DBUS_SHIFT		0
+#define LCD_CBUS_SHIFT		0
+
 /* write in 4 byte mode (LSb) */
 /* don't call this yourself */
 void
 lcd_write4(uint8_t rs, uint8_t rw, uint8_t data)
 {
-	uint8_t			ctrl = 8;
+	/* uint8_t			ctrl = 0; */
+	uint8_t			ctrl = 8; /* XXX to keep lcd power on */
 
 	if (rw)
 		ctrl += LCD_P_RW;
@@ -75,7 +75,7 @@ lcd_write4(uint8_t rs, uint8_t rw, uint8_t data)
 		ctrl += LCD_P_RS;
 
 	/* data bus on 4 most sig bits of PORTD */
-	LCD_DATA = data << data_bus_shift;
+	LCD_DATA = data << LCD_DBUS_SHIFT;
 
 	/* bring EN pin up and down again */
 	LCD_CTRL = ctrl & ((~LCD_P_EN) & 0x0f);
@@ -96,6 +96,7 @@ lcd_write8(uint8_t rs, uint8_t rw, uint8_t data)
 	if (rs)
 		delay = LCD_DELAY_DATA;
 
+	/* we must do the 8 bit write in 2 small 4 bits ones */
 	low = data & 0x0f;
 	high = (data & 0xf0) >> 4;
 
@@ -120,23 +121,12 @@ lcd_put_string(char *s)
 }
 
 /*
- * set number of bits, number of lines and font
+ * set number of bits to 4, number of lines and font
  */
 void
 lcd_function_set(uint8_t num_lines)
 {
 	uint8_t			ctrl = LCD_FS_BASE;
-
-	switch (lcd_bits) {
-	case 8:
-		ctrl = ctrl + LCD_P_FS_N;
-		break;
-	case 4:
-		break;
-	default:
-		exit (1); /* bad, should not happen */
-		break;
-	};
 
 	switch (num_lines) {
 	case 2:
@@ -151,8 +141,7 @@ lcd_function_set(uint8_t num_lines)
 	/* XXX other font */
 
 	lcd_write8(0, 0, ctrl);
-	if (lcd_bits == 4)
-		lcd_write4(0, 0, 0);
+	lcd_write4(0, 0, 0);
 }
 
 void
