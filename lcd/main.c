@@ -20,7 +20,7 @@
 
 #include <avr/io.h>
 
-#include "lcdparams.h"
+#include "ealcd_params.h"
 #include "ealcd.h"
 
 int
@@ -34,28 +34,28 @@ main(void)
 	/* PORTC for LCD control bus */
 	DDRC = 0x0f;
 
-	LCD_DATA = 0;
-	LCD_CTRL = 0;
+	EALCD_DATA = 0;
+	EALCD_CTRL = 0;
 
 	/* set up lcd */
-	lcd_init();
+	ealcd_init();
 
 	/* set number of lines */
-	lcd_function_set(2);
+	ealcd_function_set(2);
 
 	/* cursor on, blink, font 1 */
-	lcd_display_ctrl(1, 1, 1);
+	ealcd_display_ctrl(1, 1, 1);
 
 	/* clear screen and start at far left */
-	lcd_home();
-	lcd_clear();
+	ealcd_home();
+	ealcd_clear();
 
-	lcd_put_string("EAVR LCD                                ");
+	ealcd_put_string("EAVR LCD                                ");
 
-	lcd_put_string("Version");
+	ealcd_put_string("Version");
 	for (c = rev; *c != ':'; c ++);
 	for (; *c != '$'; c ++)
-		lcd_put_char(*c);
+		ealcd_put_char(*c);
 
 	while(1);
 

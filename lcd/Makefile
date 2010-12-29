@@ -1,4 +1,4 @@
-PROG=lcd
+PROG=ealcd
 
 # tools
 AVRDUDE=avrdude -F -V
@@ -22,10 +22,10 @@ SUDO=sudo
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 .PHONY: all
-all: lcd.o main.o ${PROG}.hex
+all: ${PROG}.o main.o ${PROG}.hex
 
-${PROG}.hex: lcd.o main.o
-	${CC} ${CFLAGS} -o ${PROG} lcd.o main.o
+${PROG}.hex: ealcd.o main.o
+	${CC} ${CFLAGS} -o ${PROG} ${PROG}.o main.o
 	$(OBJCOPY) -O $(BIN_FORMAT) -R .eeprom ${PROG} ${PROG}.hex
 
 .PHONY: clean

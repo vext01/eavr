@@ -19,41 +19,41 @@
 #define __EALCD_H
 
 /* command "bases", commands before any params set */
-#define LCD_CLEAR_BASE		(1 << 0)
-#define LCD_HOME_BASE		(1 << 1)
-#define LCD_DC_BASE		(1 << 3)
-#define LCD_FS_BASE		(1 << 5)
+#define EALCD_CLEAR_BASE	(1 << 0)
+#define EALCD_HOME_BASE		(1 << 1)
+#define EALCD_DC_BASE		(1 << 3)
+#define EALCD_FS_BASE		(1 << 5)
 
 /* non data pins */
-#define LCD_P_EN		(1 << 0)
-#define LCD_P_RW		(1 << 1)
-#define LCD_P_RS		(1 << 2)
-#define LCD_P_PO		(1 << 4)
+#define EALCD_P_EN		(1 << 0)
+#define EALCD_P_RW		(1 << 1)
+#define EALCD_P_RS		(1 << 2)
+#define EALCD_P_PO		(1 << 4)
 
 /* function set stuff */
-#define LCD_P_FS_DL		(1 << 4)
-#define LCD_P_FS_N		(1 << 3)
-#define LCD_P_FS_F		(1 << 2)
+#define EALCD_P_FS_DL		(1 << 4)
+#define EALCD_P_FS_N		(1 << 3)
+#define EALCD_P_FS_F		(1 << 2)
 
 /* display control stuff */
-#define LCD_P_DC_D		(1 << 2)
-#define LCD_P_DC_C		(1 << 1)
-#define LCD_P_DC_B		(1 << 0)
+#define EALCD_P_DC_D		(1 << 2)
+#define EALCD_P_DC_C		(1 << 1)
+#define EALCD_P_DC_B		(1 << 0)
 
 /* bit bang time allowances */
-#define LCD_DELAY_INIT		15
-#define LCD_DELAY_CMD		5
-#define LCD_DELAY_DATA		1
+#define EALCD_DELAY_INIT	15
+#define EALCD_DELAY_CMD		5
+#define EALCD_DELAY_DATA	1
 
-void			lcd_init();
-void			lcd_write4(uint8_t rs, uint8_t rw, uint8_t data);
-void			lcd_write8(uint8_t rs, uint8_t rw, uint8_t data);
-void			lcd_put_char(char c);
-void			lcd_put_string(char *s);
-void			lcd_function_set(uint8_t num_lines);
-void			lcd_display_ctrl(uint8_t on, uint8_t cursor,
+void			ealcd_init();
+void			ealcd_write4(uint8_t rs, uint8_t rw, uint8_t data);
+void			ealcd_write8(uint8_t rs, uint8_t rw, uint8_t data);
+void			ealcd_put_char(char c);
+void			ealcd_put_string(char *s);
+void			ealcd_function_set(uint8_t num_lines);
+void			ealcd_display_ctrl(uint8_t on, uint8_t cursor,
 				uint8_t blink);
-void			lcd_clear();
-void			lcd_home();
+void			ealcd_clear();
+void			ealcd_home();
 
 #endif /* ealcd.h */

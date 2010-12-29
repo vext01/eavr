@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "lcdparams.h"
+#include "ealcd_params.h"
 #include "ealcd.h"
 
 /*
@@ -34,81 +34,81 @@
  */
 
 void
-lcd_init()
+ealcd_init()
 {
 	/* power lcd logic */
-	LCD_CTRL = 0x8;
-	_delay_ms(LCD_DELAY_INIT);
+	EALCD_CTRL = EALCD_P_PO;
+	_delay_ms(EALCD_DELAY_INIT);
 }
 
 /* write in 4 byte mode (LSb) */
 void
-lcd_write4(uint8_t rs, uint8_t rw, uint8_t data)
+ealcd_write4(uint8_t rs, uint8_t rw, uint8_t data)
 {
-	uint8_t			ctrl = 8; /* LCD_CTRL << 4 == lcd power */
+	uint8_t			ctrl = 8; /* EALCD_CTRL << 4 == lcd power */
 
 	if (rw)
-		ctrl += LCD_P_RW;
+		ctrl += EALCD_P_RW;
 
 	if (rs)
-		ctrl += LCD_P_RS;
+		ctrl += EALCD_P_RS;
 
 	/* data bus on 4 most sig bits of PORTD */
-	LCD_DATA = data << LCD_DBUS_SHIFT;
+	EALCD_DATA = data << EALCD_DBUS_SHIFT;
 
 	/* bring EN pin up and down again */
-	LCD_CTRL = ctrl & ((~LCD_P_EN) & 0x0f);
-	_delay_ms(LCD_DELAY_CMD);
-	LCD_CTRL = ctrl | LCD_P_EN;
-	_delay_ms(LCD_DELAY_CMD);
-	LCD_CTRL = ctrl & ((~LCD_P_EN) & 0x0f);
+	EALCD_CTRL = ctrl & ((~EALCD_P_EN) & 0x0f);
+	_delay_ms(EALCD_DELAY_CMD);
+	EALCD_CTRL = ctrl | EALCD_P_EN;
+	_delay_ms(EALCD_DELAY_CMD);
+	EALCD_CTRL = ctrl & ((~EALCD_P_EN) & 0x0f);
 }
 
 void
-lcd_write8(uint8_t rs, uint8_t rw, uint8_t data)
+ealcd_write8(uint8_t rs, uint8_t rw, uint8_t data)
 {
 	uint8_t			low, high;
-	uint16_t		delay = LCD_DELAY_CMD;
+	uint16_t		delay = EALCD_DELAY_CMD;
 
 	/* data bus is much faster to write */
 	if (rs)
-		delay = LCD_DELAY_DATA;
+		delay = EALCD_DELAY_DATA;
 
 	/* we must do the 8 bit write in 2 small 4 bits ones */
 	low = data & 0x0f;
 	high = (data & 0xf0) >> 4;
 
-	lcd_write4(rs, rw, high);
-	lcd_write4(rs, rw, low);
+	ealcd_write4(rs, rw, high);
+	ealcd_write4(rs, rw, low);
 
 	/* a delay after each 2 nibbles */
 	_delay_ms(delay);
 }
 
 void
-lcd_put_char(char c)
+ealcd_put_char(char c)
 {
-	lcd_write8(1, 0, c);
+	ealcd_write8(1, 0, c);
 }
 
 void
-lcd_put_string(char *s)
+ealcd_put_string(char *s)
 {
 	for (; *s != 0; s ++)
-		lcd_put_char(*s);
+		ealcd_put_char(*s);
 }
 
 /*
  * set number of bits to 4, number of lines and font
  */
 void
-lcd_function_set(uint8_t num_lines)
+ealcd_function_set(uint8_t num_lines)
 {
-	uint8_t			ctrl = LCD_FS_BASE;
+	uint8_t			ctrl = EALCD_FS_BASE;
 
 	switch (num_lines) {
 	case 2:
-		ctrl = ctrl + LCD_P_FS_N;
+		ctrl = ctrl + EALCD_P_FS_N;
 		break;
 	case 1:
 		break;
@@ -118,35 +118,35 @@ lcd_function_set(uint8_t num_lines)
 
 	/* XXX other font */
 
-	lcd_write8(0, 0, ctrl);
-	lcd_write4(0, 0, 0);
+	ealcd_write8(0, 0, ctrl);
+	ealcd_write4(0, 0, 0);
 }
 
 void
-lcd_display_ctrl(uint8_t on, uint8_t cursor, uint8_t blink)
+ealcd_display_ctrl(uint8_t on, uint8_t cursor, uint8_t blink)
 {
-	uint8_t			ctrl = LCD_DC_BASE;
+	uint8_t			ctrl = EALCD_DC_BASE;
 
 	if (on)
-		ctrl += LCD_P_DC_D;
+		ctrl += EALCD_P_DC_D;
 
 	if (cursor)
-		ctrl += LCD_P_DC_C;
+		ctrl += EALCD_P_DC_C;
 
 	if (blink)
-		ctrl += LCD_P_DC_B;
+		ctrl += EALCD_P_DC_B;
 
-	lcd_write8(0, 0, ctrl);
+	ealcd_write8(0, 0, ctrl);
 }
 
 void
-lcd_clear()
+ealcd_clear()
 {
-	lcd_write8(0, 0, LCD_CLEAR_BASE);
+	ealcd_write8(0, 0, EALCD_CLEAR_BASE);
 }
 
 void
-lcd_home()
+ealcd_home()
 {
-	lcd_write8(0, 0, LCD_HOME_BASE);
+	ealcd_write8(0, 0, EALCD_HOME_BASE);
 }
