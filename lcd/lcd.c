@@ -22,27 +22,26 @@
 #include <util/delay.h>
 #include <stdlib.h>
 
+/* command "bases", commands before any params set */
+#define LCD_CLEAR_BASE		(1 << 0)
+#define LCD_HOME_BASE		(1 << 1)
+#define LCD_DC_BASE		(1 << 3)
+#define LCD_FS_BASE		(1 << 5)
+
 /* non data pins */
 #define LCD_P_EN		(1 << 0)
 #define LCD_P_RW		(1 << 1)
 #define LCD_P_RS		(1 << 2)
 
 /* function set stuff */
-#define LCD_FS_BASE		(1 << 5)
-
 #define LCD_P_FS_DL		(1 << 4)
 #define LCD_P_FS_N		(1 << 3)
 #define LCD_P_FS_F		(1 << 2)
 
 /* display control stuff */
-#define LCD_DC_BASE		(1 << 3)
-
 #define LCD_P_DC_D		(1 << 2)
 #define LCD_P_DC_C		(1 << 1)
 #define LCD_P_DC_B		(1 << 0)
-
-#define LCD_CLEAR_BASE		(1)
-#define LCD_HOME_BASE		(2)
 
 /* which ports is your shit on? */
 #define	LCD_CTRL		PORTB
@@ -200,53 +199,23 @@ main(void)
 	/* set PORTD for LCD output */
 	DDRB = 0xff;
 	DDRD = 0xf0;
-	DDRC = 0xff;
 
 	LCD_DATA = 0;
 	LCD_CTRL = 0;
 
+	/* wait for lcd to come up */
 	_delay_ms(LCD_DELAY_INIT);
-
-	/*
-	 * the following is the example from the data sheet
-	 */
-
-	/* 4 bit operation */
-	//debug_blink();
-	//lcd_write4(0, 0, 0b0010);
-
-	/* 4 bit operation (again?!) + set font */
-	//debug_blink();
-	//lcd_write4(0, 0, 0b0010);
-	//lcd_write4(0, 0, 0b0000);
 
 	lcd_function_set(2);
 
-	/* turn on display and cursor */
-	//debug_blink();
-	//lcd_write4(0, 0, 0b0000);
-	//lcd_write4(0, 0, 0b1110);
-
+	/* cursor on, blink, font 1 */
 	lcd_display_ctrl(1, 1, 1);
 
-
-	//lcd_put_string("T");
-	//
-
-	/* home */
-	//debug_blink();
-	//lcd_write4(0, 0, 0b0);
-	//lcd_write4(0, 0, 0b10);
-
+	/* clear screen and start at far left */
 	lcd_home();
-
 	lcd_clear();
 
-	/* put a 'H' */
-	//debug_blink();
-	//lcd_write4(1, 0, 0b100);
-	//lcd_write4(1, 0, 0b1000);
-
+	/* put stuff */
 	lcd_put_string("FUCKSHIT!!!!!");
 
 	while(1);
