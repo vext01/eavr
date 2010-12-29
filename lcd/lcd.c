@@ -46,14 +46,19 @@
 
 /* bit bang time allowances */
 #define LCD_DELAY_INIT		15
-#define LCD_DELAY_CMD		6
+#define LCD_DELAY_CMD		5
 #define LCD_DELAY_DATA		1
 
 /*
  * XXX make operations non-blatting, ie use the current values of the
  * AVR ports and just ammend what we need to change. Will prevent
  * peripherals on other pins from being nuked.
- */ 
+ *
+ * Also currently assumed that the 4th bit of the control bus is the
+ * LCD logic power. We hold this low and bring it up after so that the
+ * arduino initialisation does not interfere with the LCD configuration.
+ *
+ */
 
 /* which ports is your shit on? */
 #define	LCD_CTRL		PORTB
@@ -61,12 +66,28 @@
 #define LCD_DBUS_SHIFT		0
 #define LCD_CBUS_SHIFT		0
 
+/* check the user defined all the stuff we needed */
+#if (!defined LCD_DATA) || !defined(LCD_CTRL)
+#error "Please define LCD_DATA and LCD_CTRL"
+#endif
+
+#if (!defined LCD_DBUS_SHIFT) || !defined(LCD_CBUS_SHIFT)
+#error "Please define LCD_CBUS_SHIFT and LCD_DBUS_SHIFT"
+#endif
+
+void
+lcd_init()
+{
+	/* power lcd logic */
+	LCD_CTRL = 0x8;
+	_delay_ms(LCD_DELAY_INIT);
+}
+
 /* write in 4 byte mode (LSb) */
 /* don't call this yourself */
 void
 lcd_write4(uint8_t rs, uint8_t rw, uint8_t data)
 {
-	//uint8_t			ctrl = LCD_CTRL & (0xf0 << LCD_CBUS_SHIFT);
 	uint8_t			ctrl = 8; /* XXX to keep lcd power on */
 
 	if (rw)
@@ -183,10 +204,11 @@ debug_blink()
 	PORTC = 0x0;
 }
 
-
 int
 main(void)
 {
+	char			rev[20] = "$Revision: 8$", *c;
+
 	/* set PORTB for LCD databus */
 	DDRB = 0x0f;
 
@@ -196,10 +218,10 @@ main(void)
 	LCD_DATA = 0;
 	LCD_CTRL = 0;
 
-	/* wait for lcd to come up */
-	_delay_ms(LCD_DELAY_INIT);
-	LCD_CTRL = 0x8; /* power lcd logic */
+	/* set up lcd */
+	lcd_init();
 
+	/* set number of lines */
 	lcd_function_set(2);
 
 	/* cursor on, blink, font 1 */
@@ -209,9 +231,12 @@ main(void)
 	lcd_home();
 	lcd_clear();
 
-	/* put stuff */
-	lcd_put_string("EAVR LCD                                ");
-	lcd_put_string("$Revision$                              ");
+	lcd_put_string("EAVR LCD - lcd.c                        ");
+
+	lcd_put_string("Version: ");
+	for (c = rev; *c != ':'; c ++);
+	for (; *c != '$'; c ++)
+		lcd_put_char(*c);
 
 	while(1);
 
