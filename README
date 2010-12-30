@@ -1,0 +1,30 @@
+/*
+ * Copyright (c) 2010, Edd Barrett <vext01@gmail.com>
+ * $Id$
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
+
+Edd's AVR Libraries
+===================
+
+This is a growing collection of general purpose C code for use on AVR
+microcontroller boards, including Arduino.
+
+For now this is just a collection of programs and Makefiles, however, in the
+future an effort will be made to create shared libaries in the correct PREFIX
+with header files. This will mean making all parameters runtime configurable
+rather than compile time configurable (as they are now). Also an autoconf build
+system will eventually be added.
+
+Hope the code is useful. If you liked it, send me an email.
