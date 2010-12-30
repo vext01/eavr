@@ -25,6 +25,13 @@
 #include "ealcd_params.h"
 #include "ealcd.h"
 
+/*
+ * We will do a fresh reset of the lcd power, so that the arduino
+ * initialisation will not screw up the lcd configuration
+ */
+#define LCD_P_POWER		(1 << 3)
+#define LCD_POWER_PORT		PORTB
+
 void
 demo_title()
 {
@@ -89,8 +96,11 @@ main(void)
 {
 
 	/* you still have to do data dirctions manually */
-	DDRB = 0x0f;
-	DDRC = 0x0f;
+	DDRC = 0b00001111;
+	DDRB = 0b00001111;
+
+	/* power lcd logic */
+	LCD_POWER_PORT = LCD_POWER_PORT | LCD_P_POWER;
 
 	/* set up lcd */
 	ealcd_init();

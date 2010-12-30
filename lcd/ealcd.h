@@ -30,7 +30,6 @@
 #define EALCD_P_EN		(1 << 0)
 #define EALCD_P_RW		(1 << 1)
 #define EALCD_P_RS		(1 << 2)
-#define EALCD_P_PO		(1 << 3) /* lcd power, not standard */
 
 /* function set stuff */
 #define EALCD_P_FS_DL		(1 << 4)

@@ -23,21 +23,9 @@
 #include "ealcd_params.h"
 #include "ealcd.h"
 
-/*
- * XXX make operations non-blatting, ie use the current values of the
- * AVR ports and just ammend what we need to change. Will prevent
- * peripherals on other pins from being nuked.
- *
- * Also currently assumed that the 4th bit of the control bus is the
- * LCD logic power. We hold this low and bring it up after so that the
- * arduino initialisation does not interfere with the LCD configuration.
- */
-
 void
 ealcd_init()
 {
-	/* power lcd logic */
-	EALCD_CBUS_PORT = EALCD_P_PO;
 	_delay_ms(EALCD_DELAY_INIT);
 }
 
@@ -45,23 +33,35 @@ ealcd_init()
 void
 ealcd_write4(uint8_t rs, uint8_t rw, uint8_t data)
 {
-	uint8_t			ctrl = EALCD_P_PO;
+	//uint8_t			ctrl = EALCD_P_PO;
+	uint8_t			cmask, c = EALCD_CBUS_PORT;
+	uint8_t			dmask, d = EALCD_DBUS_PORT;
+
+	/* zero off the ctrl bus  pins */
+	cmask = 0x07 << EALCD_CBUS_SHIFT;
+	c &= (~cmask);
+
+	/* zero off the data bus pins */
+	dmask = 0x0f << EALCD_DBUS_SHIFT;
+	d &= (~dmask);
 
 	if (rw)
-		ctrl += EALCD_P_RW;
+		c += EALCD_P_RW << EALCD_CBUS_SHIFT;
 
 	if (rs)
-		ctrl += EALCD_P_RS;
+		c += EALCD_P_RS << EALCD_CBUS_SHIFT;
 
-	/* data bus on 4 most sig bits of PORTD */
-	EALCD_DBUS_PORT = data << EALCD_DBUS_SHIFT;
+	EALCD_DBUS_PORT = (data << EALCD_DBUS_SHIFT) | d;
 
 	/* bring EN pin up and down again */
-	EALCD_CBUS_PORT = ctrl & ((~EALCD_P_EN) & 0x0f);
+	//EALCD_CBUS_PORT = c & ((~EALCD_P_EN) & 0x0f);
+	EALCD_CBUS_PORT = c & ((~EALCD_P_EN) << EALCD_CBUS_SHIFT);
 	_delay_ms(EALCD_DELAY_CMD);
-	EALCD_CBUS_PORT = ctrl | EALCD_P_EN;
+	//EALCD_CBUS_PORT = c | EALCD_P_EN;
+	EALCD_CBUS_PORT = c | (EALCD_P_EN << EALCD_CBUS_SHIFT);
 	_delay_ms(EALCD_DELAY_CMD);
-	EALCD_CBUS_PORT = ctrl & ((~EALCD_P_EN) & 0x0f);
+	//EALCD_CBUS_PORT = c & ((~EALCD_P_EN) & 0x0f);
+	EALCD_CBUS_PORT = c & ((~EALCD_P_EN) << EALCD_CBUS_SHIFT);
 }
 
 void
