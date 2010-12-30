@@ -33,3 +33,9 @@ Contents
 --------
 
 lcd/		4-bit HD44780 LCD driver.
+
+History
+-------
+
+30/12/2010	0.1	First release - Only LCD driver implemented.
+
