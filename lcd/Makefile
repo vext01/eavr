@@ -18,7 +18,7 @@ PART=ATMEGA328P
 CFLAGS=-Wall -Os -DF_CPU=$(F_CPU) -mmcu=$(MCU)
 SUDO=sudo
 
-.c.o:
+.c.o: ealcd_params.h
 	$(CC) -c $(CFLAGS) -o $@ $<
 
 .PHONY: all
