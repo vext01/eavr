@@ -1,3 +1,6 @@
+# EAVR Makefile
+# $Id$
+
 PROG=ealcd
 
 # tools
