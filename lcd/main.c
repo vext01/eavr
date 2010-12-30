@@ -22,7 +22,6 @@
 #include <util/delay.h>
 #include <stdio.h>
 
-#include "ealcd_params.h"
 #include "ealcd.h"
 
 /*
@@ -94,12 +93,13 @@ demo_chevrons()
 int
 main(void)
 {
-
 	/* you still have to do data dirctions manually */
 	DDRC = 0b00001111;
 	DDRB = 0b00001111;
 
-	/* power lcd logic */
+	/* power cycle lcd */
+	LCD_POWER_PORT = LCD_POWER_PORT & (~LCD_P_POWER);
+	_delay_ms(1);
 	LCD_POWER_PORT = LCD_POWER_PORT | LCD_P_POWER;
 
 	/* set up lcd */
