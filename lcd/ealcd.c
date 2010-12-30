@@ -26,7 +26,7 @@
 void
 ealcd_init()
 {
-	_delay_ms(EALCD_DELAY_INIT);
+	EALCD_POWERUP_WAIT
 }
 
 /* write in 4 byte mode (LSb) */
@@ -53,26 +53,25 @@ ealcd_write4(uint8_t rs, uint8_t rw, uint8_t data)
 
 	EALCD_DBUS_PORT = (data << EALCD_DBUS_SHIFT) | d;
 
-	/* bring EN pin up and down again */
-	//EALCD_CBUS_PORT = c & ((~EALCD_P_EN) & 0x0f);
+	/* bring EN pin down */
 	EALCD_CBUS_PORT = c & ((~EALCD_P_EN) << EALCD_CBUS_SHIFT);
-	_delay_ms(EALCD_DELAY_CMD);
-	//EALCD_CBUS_PORT = c | EALCD_P_EN;
+
+	/* EN up */
 	EALCD_CBUS_PORT = c | (EALCD_P_EN << EALCD_CBUS_SHIFT);
-	_delay_ms(EALCD_DELAY_CMD);
-	//EALCD_CBUS_PORT = c & ((~EALCD_P_EN) & 0x0f);
+	EALCD_EN_UP_DELAY
+
+	/* EN down again */
 	EALCD_CBUS_PORT = c & ((~EALCD_P_EN) << EALCD_CBUS_SHIFT);
+	if (rs)
+		EALCD_EN_DOWN_DELAY_DATA
+	else
+		EALCD_EN_DOWN_DELAY_CMD
 }
 
 void
 ealcd_write8(uint8_t rs, uint8_t rw, uint8_t data)
 {
 	uint8_t			low, high;
-	uint16_t		delay = EALCD_DELAY_CMD;
-
-	/* data bus is much faster to write */
-	if (rs)
-		delay = EALCD_DELAY_DATA;
 
 	/* we must do the 8 bit write in 2 small 4 bits ones */
 	low = data & 0x0f;
@@ -80,9 +79,6 @@ ealcd_write8(uint8_t rs, uint8_t rw, uint8_t data)
 
 	ealcd_write4(rs, rw, high);
 	ealcd_write4(rs, rw, low);
-
-	/* a delay after each 2 nibbles */
-	_delay_ms(delay);
 }
 
 void

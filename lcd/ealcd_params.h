@@ -18,6 +18,8 @@
 #ifndef __EALCD_PARAMS_H
 #define __EALCD_PARAMS_H
 
+#include "ealcd_params.h"
+
 /* which ports is your shit on? */
 #define	EALCD_CBUS_PORT		PORTB
 #define EALCD_DBUS_PORT		PORTC
@@ -30,8 +32,22 @@
  *
  * Eg, if data pins are on pins 2, 3, 4, 5 of a port:
  *   EALCD_CBUS_SHIFT 2
+ *
+ * Note, we say "control bus" for the 3 pins:
+ *
  */
 #define EALCD_DBUS_SHIFT	0
 #define EALCD_CBUS_SHIFT	0
+
+/*
+ * timing - mileage will vary - this seems ok on my HD44780
+ * See: http://joshuagalloway.com/lcd.html
+ */
+
+/* time to hold en pin up on a write */
+#define EALCD_EN_UP_DELAY		_delay_us(1); /* wait atleast 450 ns */
+#define EALCD_EN_DOWN_DELAY_DATA	_delay_us(200);
+#define EALCD_EN_DOWN_DELAY_CMD		_delay_ms(5);
+#define EALCD_POWERUP_WAIT		_delay_ms(20);
 
 #endif

@@ -51,11 +51,6 @@
 #define EALCD_SHIFT_CURS	0
 #define EALCD_SHIFT_DISP	1
 
-/* bit bang time allowances */
-#define EALCD_DELAY_INIT	15
-#define EALCD_DELAY_CMD		5
-#define EALCD_DELAY_DATA	1
-
 void			ealcd_init();
 void			ealcd_write4(uint8_t rs, uint8_t rw, uint8_t data);
 void			ealcd_write8(uint8_t rs, uint8_t rw, uint8_t data);
